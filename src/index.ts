@@ -1,12 +1,13 @@
 import express from 'express';
 import axios from 'axios';
 
+import './environment';
 import './externalService';
 
 import { groupBy } from './utils';
 import { MediaContext, Media } from './types';
 
-const SERVICE_API = 'https://api.veriff.internal';
+const SERVICE_API = process.env.API;
 
 const app = express();
 const port = 3000;
@@ -25,7 +26,9 @@ app.get('/api/sessions/:sessionId', async (req, res) => {
         return {
           ...context,
           context: `document-${context.context}`,
-          mimeType,
+          metadata: {
+            mimeType,
+          }
         };
       })
       .sort((a, b) => b.probability - a.probability);
