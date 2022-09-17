@@ -10,4 +10,3 @@ export type Media = {
   context: string,
   mimeType: string,
 };
-
