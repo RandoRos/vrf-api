@@ -1,3 +1,5 @@
+import './externalService';
+
 import instance from './axios';
 import { groupBy } from './utils';
 import { MediaContext, Media } from './types';
@@ -8,6 +10,7 @@ export const mediaContextController = async (req, res) => {
   try {
     const { sessionId } = req.params;
 
+    // Promise.all works in my case because I added retry mechanism
     const [ contextData, mediaData ] = await Promise.all([
       instance.get<MediaContext[]>(`${SERVICE_API}/media-context/${sessionId}`),
       instance.get<Media[]>(`${SERVICE_API}/sessions/${sessionId}/media`),
@@ -20,12 +23,10 @@ export const mediaContextController = async (req, res) => {
         return {
           ...context,
           context: `document-${context.context}`,
-          metadata: {
-            mimeType,
-          }
+          ...(mimeType && { metadata: { mimeType } }),
         };
       })
-      .sort((a, b) => (b?.probability || 0) - (a?.probability || 0));
+      .sort((a, b) => b.probability - a.probability);
 
     return res.status(200).json(groupBy(finalResp, 'context'));
   } catch (error: any) {

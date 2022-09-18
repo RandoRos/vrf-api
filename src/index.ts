@@ -1,11 +1,10 @@
 import express from 'express';
 
 import './environment';
-import './externalService';
 
 import { mediaContextController } from './controller';
 
-const app = express();
+export const app = express();
 const port = 3000;
 
 const router = express.Router();
