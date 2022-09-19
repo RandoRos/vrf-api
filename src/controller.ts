@@ -1,7 +1,6 @@
 import './externalService';
 
 import instance from './axios';
-import { groupBy } from './utils';
 import { MediaContext, Media } from './types';
 
 const SERVICE_API = process.env.API;
@@ -16,19 +15,34 @@ export const mediaContextController = async (req, res) => {
       instance.get<Media[]>(`${SERVICE_API}/sessions/${sessionId}/media`),
     ]);
 
+    // Maybe not so 'nice' but reduces execution time
     const finalResp = contextData.data
-      .filter(data => data.context !== 'none') // O(n), can also be removed and filter inside map
-      .map(context => {
-        const { mimeType } = mediaData.data.find(media => media.id === context.mediaId) || {};
-        return {
-          ...context,
-          context: `document-${context.context}`,
-          ...(mimeType && { metadata: { mimeType } }),
-        };
-      })
-      .sort((a, b) => b.probability - a.probability);
+      .sort((a, b) => b.probability - a.probability)
+      .reduce((res, ctx) => {
+        if (ctx.context === 'none') {
+          return res;
+        }
 
-    return res.status(200).json(groupBy(finalResp, 'context'));
+        const { id, mimeType } = mediaData.data.find(media => media.id === ctx.mediaId) || {};
+        const key = `document-${ctx.context}`;
+
+        if (!res[key]) {
+          res[key] = [];
+        }
+
+        res[key].push({
+          id: ctx.id,
+          context: key,
+          probability: ctx.probability,
+          media: { id, mimeType },
+          // ...(mimeType && { metadata: { mimeType } }),
+        });
+
+        return res;
+      }, {});
+
+
+    return res.status(200).json(finalResp);
   } catch (error: any) {
     console.error('Error happened', error);
     return res.status(error.response.status).json({ message: error.response.data });

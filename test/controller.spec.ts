@@ -31,5 +31,6 @@ describe('mediaContextController', () => {
 
     // sorting
     expect(result['document-front'][0].probability).toBe(0.9);
+    expect(result['document-front'][1].probability).toBe(0.2);
   })
 });
