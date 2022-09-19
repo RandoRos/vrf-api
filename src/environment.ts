@@ -3,3 +3,4 @@
 
 process.env['API'] = 'https://api.veriff.internal';
 process.env['AXIOS_RETRY_COUNT'] = '3';
+process.env['AXIOS_RETRY_TIMEOUT'] = '500';

@@ -11,10 +11,14 @@ instance.interceptors.response.use(undefined, err => {
   if (!config?.retry) {
     return Promise.reject(err);
   }
-  
+
   config.retry -= 1;
 
-  return new Promise((resolve) => resolve(axios(config)));
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(instance(config));
+    }, Number(process.env.AXIOS_RETRY_TIMEOUT) || 1000);
+  });
 });
 
 export default instance;
