@@ -34,8 +34,10 @@ export const mediaContextController = async (req, res) => {
           id: ctx.id,
           context: key,
           probability: ctx.probability,
-          media: { id, mimeType },
-          // ...(mimeType && { metadata: { mimeType } }),
+          media: { 
+            id,
+            mimeType,
+          },
         });
 
         return res;
