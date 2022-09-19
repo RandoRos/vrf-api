@@ -47,6 +47,6 @@ export const mediaContextController = async (req, res) => {
     return res.status(200).json(finalResp);
   } catch (error: any) {
     console.error('Error happened', error);
-    return res.status(error.response.status).json({ message: error.response.data });
+    return res.status(error.response?.status || error.status).json({ message: error.response?.data || error.message });
   }
 }
